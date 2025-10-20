@@ -357,7 +357,8 @@ let quotes = JSON.parse(localStorage.getItem("quotes")) || [
     const mergedQuotes = mergeQuotes(quotes, serverQuotes);
     quotes = mergedQuotes;
     saveQuotes();
-    showNotification("Data synced with server!");
+    showNotification("Quotes synced with server!");
+
   }
   
   // ✅ Periodically check for updates
