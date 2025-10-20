@@ -5,33 +5,74 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dynamic Quote Generator</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; background:#f5f5f5; padding:30px; }
-    #quoteDisplay { font-size:1.1rem; margin:20px auto; padding:15px; background:#fff; border-radius:8px; width:80%; max-width:600px; box-shadow:0 2px 8px rgba(0,0,0,0.1); min-height:60px; }
-    input { margin:5px; padding:8px; border-radius:4px; border:1px solid #ccc; width:200px; }
-    button { padding:8px 15px; border:none; border-radius:4px; background:#007bff; color:#fff; cursor:pointer; margin-top:10px; }
-    button:hover { background:#0056b3; }
-    .controls { margin-top: 12px; }
-    .storage-controls { margin-top: 16px; }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f5f5f5;
+      padding: 30px;
+    }
+
+    #quoteDisplay {
+      font-size: 1.1rem;
+      margin: 20px auto;
+      padding: 15px;
+      background: #fff;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 600px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      min-height: 60px;
+    }
+
+    select, input, button {
+      margin: 5px;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .controls, .storage-controls {
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
   <h1>Dynamic Quote Generator</h1>
 
-  <!-- Quote Display Section -->
-  <div id="quoteDisplay">Click "Show New Quote" to begin!</div>
+  <!-- Category Filter Dropdown -->
+  <div>
+    <label for="categoryFilter"><strong>Filter by Category:</strong></label>
+    <select id="categoryFilter" onchange="filterQuotes()">
+      <option value="all">All Categories</option>
+    </select>
+  </div>
+
+  <!-- Quote Display -->
+  <div id="quoteDisplay">Select a category or click "Show New Quote".</div>
 
   <!-- Buttons -->
   <div class="controls">
     <button id="newQuote">Show New Quote</button>
   </div>
 
-  <!-- Dynamic Form will be inserted here by createAddQuoteForm() -->
+  <!-- Add Quote Form Area -->
   <div id="formArea" style="margin-top:16px;"></div>
 
-  <!-- Export / Import controls -->
+  <!-- Export/Import -->
   <div class="storage-controls">
-    <button id="exportBtn" type="button">Export Quotes (JSON)</button>
-    <input type="file" id="importFile" accept=".json" style="margin-left:10px;">
+    <button id="exportBtn">Export Quotes (JSON)</button>
+    <input type="file" id="importFile" accept=".json" />
   </div>
 
   <script src="script.js"></script>
