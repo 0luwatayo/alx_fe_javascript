@@ -191,70 +191,206 @@ function init() {
 
 document.addEventListener('DOMContentLoaded', init);
 
-const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts'; // placeholder server
+//const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts'; // placeholder server
 
 // Fetch quotes from "server"
-async function fetchQuotesFromServer() {
+// async function fetchQuotesFromServer() {
+//     try {
+//       const response = await fetch(SERVER_URL);
+//       const data = await response.json();
+  
+//       // Simulate quote objects with text & category
+//       const serverQuotes = data.slice(0, 5).map(item => ({
+//         text: item.title,
+//         category: 'server'
+//       }));
+  
+//       return serverQuotes;
+//     } catch (error) {
+//       console.error('Error fetching from server:', error);
+//       return [];
+//     }
+//   }
+
+//   function mergeQuotes(localQuotes, serverQuotes) {
+//     const merged = [...localQuotes];
+  
+//     serverQuotes.forEach(serverQuote => {
+//       const existing = merged.find(q => q.text === serverQuote.text);
+//       if (existing) {
+        // Conflict detected — server takes precedence
+    //     existing.category = serverQuote.category;
+    //     showNotification('Conflict resolved: Server data used.');
+    //   } else {
+        // New quote from server
+//         merged.push(serverQuote);
+//         showNotification('New quote synced from server.');
+//       }
+//     });
+  
+//     return merged;
+//   }
+
+//   async function syncWithServer() {
+//     const serverQuotes = await fetchQuotesFromServer();
+//     const mergedQuotes = mergeQuotes(quotes, serverQuotes);
+  
+    // Save merged data to localStorage
+    quotes = mergedQuotes;
+//     saveQuotes();
+//     populateCategories();
+//   }
+
+//   setInterval(syncWithServer, 10000); // Sync every 10 seconds
+
+//   function showNotification(message) {
+//     const feedbackDiv = document.getElementById('form-feedback') || document.createElement('div');
+//     feedbackDiv.id = 'form-feedback';
+//     feedbackDiv.style.backgroundColor = '#fff3cd';
+//     feedbackDiv.style.color = '#856404';
+//     feedbackDiv.style.padding = '10px';
+//     feedbackDiv.style.marginTop = '10px';
+//     feedbackDiv.style.borderRadius = '4px';
+//     feedbackDiv.textContent = message;
+//     document.body.appendChild(feedbackDiv);
+  
+//     setTimeout(() => feedbackDiv.remove(), 4000); // auto-remove after 4s
+//   }
+
+//   document.getElementById('syncBtn').addEventListener('click', syncWithServer);
+
+// Initialize local quotes array
+let quotes = JSON.parse(localStorage.getItem("quotes")) || [
+    { text: "The best way to predict the future is to create it.", category: "motivation" },
+    { text: "Do what you can, with what you have, where you are.", category: "inspiration" }
+  ];
+  
+  const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
+  
+  // Save quotes to local storage
+  function saveQuotes() {
+    localStorage.setItem("quotes", JSON.stringify(quotes));
+  }
+  
+  // Show a random quote
+  function showRandomQuote() {
+    const quoteDisplay = document.getElementById("quoteDisplay");
+    if (quotes.length === 0) {
+      quoteDisplay.textContent = "No quotes available.";
+      return;
+    }
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    quoteDisplay.textContent = quotes[randomIndex].text;
+  }
+  
+  // Add new quote dynamically
+  function addQuote() {
+    const newQuoteText = document.getElementById("newQuoteText").value.trim();
+    const newQuoteCategory = document.getElementById("newQuoteCategory").value.trim();
+  
+    if (newQuoteText && newQuoteCategory) {
+      const newQuote = { text: newQuoteText, category: newQuoteCategory };
+      quotes.push(newQuote);
+      saveQuotes();
+      showNotification("Quote added successfully!");
+      postQuoteToServer(newQuote); // Sync new quote to server
+    } else {
+      showNotification("Please fill in both fields before adding a quote.");
+    }
+  }
+  
+  // ✅ POST new quote to server (mock API)
+  async function postQuoteToServer(quote) {
+    try {
+      const response = await fetch(SERVER_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(quote)
+      });
+      const data = await response.json();
+      console.log("Quote synced to server:", data);
+    } catch (error) {
+      console.error("Error posting quote:", error);
+    }
+  }
+  
+  // ✅ Fetch quotes from server (mock simulation)
+  async function fetchQuotesFromServer() {
     try {
       const response = await fetch(SERVER_URL);
       const data = await response.json();
-  
       // Simulate quote objects with text & category
-      const serverQuotes = data.slice(0, 5).map(item => ({
+      return data.slice(0, 5).map(item => ({
         text: item.title,
-        category: 'server'
+        category: "server"
       }));
-  
-      return serverQuotes;
     } catch (error) {
-      console.error('Error fetching from server:', error);
+      console.error("Error fetching quotes:", error);
       return [];
     }
   }
-
+  
+  // ✅ Merge local & server data (conflict resolution)
   function mergeQuotes(localQuotes, serverQuotes) {
     const merged = [...localQuotes];
   
     serverQuotes.forEach(serverQuote => {
       const existing = merged.find(q => q.text === serverQuote.text);
       if (existing) {
-        // Conflict detected — server takes precedence
+        // Conflict detected — prefer server version
         existing.category = serverQuote.category;
-        showNotification('Conflict resolved: Server data used.');
+        showNotification("Conflict resolved: Server version used.");
       } else {
-        // New quote from server
         merged.push(serverQuote);
-        showNotification('New quote synced from server.');
+        showNotification("New quote synced from server.");
       }
     });
   
     return merged;
   }
-
-  async function syncWithServer() {
+  
+  // ✅ Main syncing function
+  async function syncQuotes() {
     const serverQuotes = await fetchQuotesFromServer();
     const mergedQuotes = mergeQuotes(quotes, serverQuotes);
-  
-    // Save merged data to localStorage
     quotes = mergedQuotes;
     saveQuotes();
-    populateCategories();
+    showNotification("Data synced with server!");
   }
-
-  setInterval(syncWithServer, 10000); // Sync every 10 seconds
-
-  function showNotification(message) {
-    const feedbackDiv = document.getElementById('form-feedback') || document.createElement('div');
-    feedbackDiv.id = 'form-feedback';
-    feedbackDiv.style.backgroundColor = '#fff3cd';
-    feedbackDiv.style.color = '#856404';
-    feedbackDiv.style.padding = '10px';
-    feedbackDiv.style.marginTop = '10px';
-    feedbackDiv.style.borderRadius = '4px';
-    feedbackDiv.textContent = message;
-    document.body.appendChild(feedbackDiv);
   
-    setTimeout(() => feedbackDiv.remove(), 4000); // auto-remove after 4s
+  // ✅ Periodically check for updates
+  setInterval(syncQuotes, 10000); // Sync every 10 seconds
+  
+  // ✅ Notification UI
+  function showNotification(message) {
+    let notifyDiv = document.getElementById("notify");
+    if (!notifyDiv) {
+      notifyDiv = document.createElement("div");
+      notifyDiv.id = "notify";
+      notifyDiv.style.position = "fixed";
+      notifyDiv.style.bottom = "10px";
+      notifyDiv.style.right = "10px";
+      notifyDiv.style.padding = "10px 15px";
+      notifyDiv.style.backgroundColor = "#fff3cd";
+      notifyDiv.style.border = "1px solid #ffeeba";
+      notifyDiv.style.color = "#856404";
+      notifyDiv.style.borderRadius = "5px";
+      document.body.appendChild(notifyDiv);
+    }
+  
+    notifyDiv.textContent = message;
+    notifyDiv.style.display = "block";
+  
+    setTimeout(() => {
+      notifyDiv.style.display = "none";
+    }, 4000);
   }
-
-  document.getElementById('syncBtn').addEventListener('click', syncWithServer);
+  
+  // Event listener for "Show New Quote"
+  document.getElementById("newQuote").addEventListener("click", showRandomQuote);
+  
+  // Initial load
+  document.addEventListener("DOMContentLoaded", showRandomQuote);
+  
