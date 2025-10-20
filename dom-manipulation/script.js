@@ -190,3 +190,71 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts'; // placeholder server
+
+// Fetch quotes from "server"
+async function fetchQuotesFromServer() {
+    try {
+      const response = await fetch(SERVER_URL);
+      const data = await response.json();
+  
+      // Simulate quote objects with text & category
+      const serverQuotes = data.slice(0, 5).map(item => ({
+        text: item.title,
+        category: 'server'
+      }));
+  
+      return serverQuotes;
+    } catch (error) {
+      console.error('Error fetching from server:', error);
+      return [];
+    }
+  }
+
+  function mergeQuotes(localQuotes, serverQuotes) {
+    const merged = [...localQuotes];
+  
+    serverQuotes.forEach(serverQuote => {
+      const existing = merged.find(q => q.text === serverQuote.text);
+      if (existing) {
+        // Conflict detected — server takes precedence
+        existing.category = serverQuote.category;
+        showNotification('Conflict resolved: Server data used.');
+      } else {
+        // New quote from server
+        merged.push(serverQuote);
+        showNotification('New quote synced from server.');
+      }
+    });
+  
+    return merged;
+  }
+
+  async function syncWithServer() {
+    const serverQuotes = await fetchQuotesFromServer();
+    const mergedQuotes = mergeQuotes(quotes, serverQuotes);
+  
+    // Save merged data to localStorage
+    quotes = mergedQuotes;
+    saveQuotes();
+    populateCategories();
+  }
+
+  setInterval(syncWithServer, 10000); // Sync every 10 seconds
+
+  function showNotification(message) {
+    const feedbackDiv = document.getElementById('form-feedback') || document.createElement('div');
+    feedbackDiv.id = 'form-feedback';
+    feedbackDiv.style.backgroundColor = '#fff3cd';
+    feedbackDiv.style.color = '#856404';
+    feedbackDiv.style.padding = '10px';
+    feedbackDiv.style.marginTop = '10px';
+    feedbackDiv.style.borderRadius = '4px';
+    feedbackDiv.textContent = message;
+    document.body.appendChild(feedbackDiv);
+  
+    setTimeout(() => feedbackDiv.remove(), 4000); // auto-remove after 4s
+  }
+
+  document.getElementById('syncBtn').addEventListener('click', syncWithServer);
