@@ -118,15 +118,24 @@ function populateCategories() {
 
 // Filter quotes
 function filterQuotes() {
-  const selected = categoryFilter.value;
-  localStorage.setItem(LOCAL_FILTER_KEY, selected);
-
-  if (selected === 'all') {
-    quoteDisplay.textContent = 'Showing all categories. Click "Show New Quote".';
-  } else {
-    quoteDisplay.textContent = `Filtered by category: ${selected}`;
+    const selectedCategory = categoryFilter.value; // ✅ variable name updated
+    localStorage.setItem(LOCAL_FILTER_KEY, selectedCategory);
+  
+    let filteredQuotes = quotes;
+  
+    if (selectedCategory !== 'all') {
+      filteredQuotes = quotes.filter(q => q.category === selectedCategory);
+    }
+  
+    if (filteredQuotes.length === 0) {
+      quoteDisplay.textContent = 'No quotes found for this category.';
+    } else {
+      // Show one random quote from the filtered list
+      const randomQuote = filteredQuotes[Math.floor(Math.random() * filteredQuotes.length)];
+      quoteDisplay.innerHTML = `<strong>${selectedCategory}</strong>: "${randomQuote.text}"`;
+    }
   }
-}
+  
 
 // Export quotes to JSON
 function exportToJsonFile() {
